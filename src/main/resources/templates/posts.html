@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Posts</title>
+</head>
+<body>
+<h2>All Posts</h2>
+<a href="/post/new">Create New Post</a>
+<ul>
+    <li th:each="post : ${posts}">
+        <div th:utext="${post.content}"></div> <!-- Hiển thị nội dung HTML -->
+    </li>
+</ul>
+</body>
+</html>

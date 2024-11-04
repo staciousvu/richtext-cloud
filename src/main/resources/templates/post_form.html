@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Post</title>
+    <!-- <link rel="stylesheet" href="path_to_your_styles.css" /> -->
+    <link rel="stylesheet" href="/richtexteditor/richtexteditor/rte_theme_default.css" />
+    <script type="text/javascript" src="/richtexteditor/richtexteditor/rte.js"></script>
+    <script type="text/javascript" src="/richtexteditor/richtexteditor/plugins/all_plugins.js"></script>
+</head>
+<body>
+<h2>Create New Post</h2>
+<form action="/post" method="post" enctype="multipart/form-data">
+    <div id="editor" style="width: 100%;">
+        <p>Hello world!</p>
+    </div>
+    <input type="hidden" id="content" name="content" />
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+    var config = {};
+
+    // Thiết lập trình xử lý tải ảnh
+    config.file_upload_handler = function(file, callback) {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        fetch('/upload/image', { // Đường dẫn đến API tải ảnh của bạn
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Gọi callback với URL ảnh để chèn vào editor
+                    callback(data.filePath);
+                } else {
+                    console.error(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                callback(null, "Lỗi tải ảnh lên");
+            });
+    };
+
+    // Khởi tạo editor với cấu hình tải ảnh
+    var editor = new RichTextEditor("#editor", config);
+
+    // Lưu nội dung của editor vào input ẩn khi submit form
+    document.querySelector("form").onsubmit = function() {
+        document.getElementById("content").value = editor.getHTMLCode();
+    };
+</script>
+<!--<h2>Create New Post</h2>-->
+<!--<form action="/post" method="post" enctype="multipart/form-data"> &lt;!&ndash; Thêm enctype &ndash;&gt;-->
+<!--    <div id="editor" style="width: 100%;">-->
+<!--        <p>Hello world!</p>-->
+<!--    </div>-->
+<!--    <input type="hidden" id="content" name="content" />-->
+<!--    <button type="submit">Submit</button>-->
+<!--</form>-->
+
+<!--&lt;!&ndash; Nút chèn ảnh &ndash;&gt;-->
+<!--<button id="uploadImageBtn">Insert Image</button>-->
+<!--<input type="file" id="imageInput" accept="image/*" style="display:none;" />-->
+
+<!--<script>-->
+<!--    var editor = new RichTextEditor("#editor");-->
+
+<!--    // Xử lý sự kiện nhấn nút chèn ảnh-->
+<!--    document.getElementById('uploadImageBtn').addEventListener('click', function() {-->
+<!--        document.getElementById('imageInput').click(); // Mở hộp thoại chọn file-->
+<!--    });-->
+
+<!--    // Xử lý sự kiện khi người dùng chọn ảnh-->
+<!--    document.getElementById('imageInput').addEventListener('change', function(event) {-->
+<!--        const file = event.target.files[0];-->
+<!--        if (file) {-->
+<!--            const formData = new FormData();-->
+<!--            formData.append('image', file);-->
+
+<!--            fetch('/upload/image', { // Đường dẫn đến API tải lên ảnh-->
+<!--                method: 'POST',-->
+<!--                body: formData-->
+<!--            })-->
+<!--                .then(response => response.json())-->
+<!--                .then(data => {-->
+<!--                    if (data.success) {-->
+<!--                        // Chèn URL ảnh vào editor-->
+<!--                            editor.insertHTML('<img src="' + data.filePath + '" alt="Image" />');-->
+<!--                    } else {-->
+<!--                        console.error(data.message);-->
+<!--                    }-->
+<!--                })-->
+<!--                .catch(error => {-->
+<!--                    console.error('Error:', error);-->
+<!--                });-->
+<!--        }-->
+<!--    });-->
+
+<!--    // Ghi lại nội dung của editor vào hidden input khi form được submit-->
+<!--    document.querySelector("form").onsubmit = function() {-->
+<!--        document.getElementById("content").value = editor.getHTMLCode();-->
+<!--    };-->
+<!--</script>-->
+</body>
+</html>
